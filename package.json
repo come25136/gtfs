@@ -1,0 +1,40 @@
+{
+  "name": "@come25136/gtfs",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/come25136/gtfs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/come25136/gtfs/issues"
+  },
+  "author": "come25136",
+  "license": "MPL-2.0",
+  "dependencies": {
+    "adm-zip": "^0.4.13",
+    "http-errors": "^1.7.3",
+    "lodash": "^4.17.14",
+    "moment": "^2.24.0",
+    "neat-csv": "^5.1.0",
+    "strip-bom-buf": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.4.32",
+    "@types/http-errors": "^1.6.1",
+    "@types/lodash": "^4.14.136",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3"
+  },
+  "scripts": {
+    "prepare": "tsc",
+    "build": "tsc",
+    "lint": "tslint --fix -p ."
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "gtfs"
+  ]
+}
