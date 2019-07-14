@@ -162,6 +162,21 @@ export interface RawTransfer {
   min_transfer_time?: string
 }
 
+export interface RawPathwas {
+  pathway_id: string
+  from_stop_id: RawStop['stop_id']
+  to_stop_id: RawStop['stop_id']
+  pathway_mode: string
+  is_bidirectional: string
+  length?: string
+  traversal_time?: string
+  stair_count?: string
+  max_slope?: string
+  min_width?: string
+  signposted_as?: string
+  reversed_signposted_as?: string
+}
+
 export interface RawFeedInfo {
   feed_publisher_name: string
   feed_publisher_url: string
@@ -709,6 +724,35 @@ export type Transfer = {
   };
 }
 
+export interface Pathwas {
+  id: string
+  from: {
+    stop: {
+      id: Stop['id']
+    }
+  }
+  to: {
+    stop: {
+      id: Stop['id']
+    }
+  }
+  pathwayMode: 1 | 2 | 3 | 4 | 5 | 6 | 7
+  isBidirectional: 0 | 1
+  length: null | number // meters!! yay!!!
+  traversalTime: null | number
+  stair: {
+    count: null | number
+  }
+  slope: {
+    max: null | number
+  }
+  width: {
+    min: null | number
+  }
+  signpostedAs: null | string
+  reversedSignpostedAs: null | string
+}
+
 export interface FeedInfo {
   publisher: {
     name: string;
@@ -745,6 +789,7 @@ export type gtfs = {
   shapes?: Shape[];
   frequencies?: Frequencie[];
   transfers?: Transfer[];
+  pathways?: Pathwas[];
   feedInfo?: FeedInfo[];
   translations?: Translation;
 } & (
@@ -1237,6 +1282,57 @@ export class GTFS {
               })
             }
 
+          case 'pathways.txt':
+            const pathways = ((await neatCsv(
+              bomZettaikorosuMan(entity.getData())
+            )) as unknown) as RawPathwas[]
+
+            return {
+              key: 'pathways',
+              rows: pathways.map<Pathwas>(row => {
+                const pathwayMode = Number(row.pathway_mode)
+                const isBidirectional = Number(row.is_bidirectional)
+
+                if ([0, 1, 2, 3, 4, 5, 6, 7].includes(pathwayMode) === false)
+                  throw new Error(
+                    `Can not use '${pathwayMode}' for pathway_mode.`
+                  )
+
+                if ([0, 1].includes(isBidirectional) === false) throw new Error(
+                  `Can not use '${isBidirectional}' for is_bidirectional.`
+                )
+
+                return {
+                  id: row.pathway_id,
+                  from: {
+                    stop: {
+                      id: row.from_stop_id
+                    }
+                  },
+                  to: {
+                    stop: {
+                      id: row.to_stop_id
+                    }
+                  },
+                  pathwayMode: pathwayMode as Pathwas['pathwayMode'],
+                  isBidirectional: isBidirectional as Pathwas['isBidirectional'],
+                  length: row.length === undefined ? null : Number(row.length),
+                  traversalTime: row.traversal_time === undefined ? null : Number(row.traversal_time),
+                  stair: {
+                    count: row.stair_count === undefined ? null : Number(row.stair_count)
+                  },
+                  slope: {
+                    max: row.max_slope === undefined ? null : Number(row.max_slope)
+                  },
+                  width: {
+                    min: row.min_width === undefined ? null : Number(row.min_width)
+                  },
+                  signpostedAs: row.signposted_as || null,
+                  reversedSignpostedAs: row.reversed_signposted_as || null
+                }
+              })
+            }
+
           case 'feed_info.txt':
             const rawFeedInfo = ((await neatCsv(
               bomZettaikorosuMan(entity.getData())
@@ -1332,6 +1428,7 @@ export class GTFS {
   readonly shapes: Shape[] = []
   readonly frequencies: Frequencie[] = []
   readonly transfers: Transfer[] = []
+  readonly pathways: Pathwas[] = []
   readonly feedInfo: FeedInfo[] = []
   readonly translations: Translation = {}
 
@@ -1349,6 +1446,7 @@ export class GTFS {
     if (gtfs.shapes !== undefined) this.shapes = gtfs.shapes
     if (gtfs.frequencies !== undefined) this.frequencies = gtfs.frequencies
     if (gtfs.transfers !== undefined) this.transfers = gtfs.transfers
+    if (gtfs.pathways !== undefined) this.pathways = gtfs.pathways
     if (gtfs.feedInfo !== undefined) this.feedInfo = gtfs.feedInfo
     if (gtfs.translations !== undefined) this.translations = gtfs.translations
   }
