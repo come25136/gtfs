@@ -177,6 +177,12 @@ export interface RawPathwas {
   reversed_signposted_as?: string
 }
 
+export interface RawLevels {
+  level_id: string
+  level_index: string
+  level_name?: string
+}
+
 export interface RawFeedInfo {
   feed_publisher_name: string
   feed_publisher_url: string
@@ -753,6 +759,12 @@ export interface Pathwas {
   reversedSignpostedAs: null | string
 }
 
+export interface Levels {
+  id: string
+  index: number
+  name: null | string
+}
+
 export interface FeedInfo {
   publisher: {
     name: string;
@@ -790,6 +802,7 @@ export type gtfs = {
   frequencies?: Frequencie[];
   transfers?: Transfer[];
   pathways?: Pathwas[];
+  levels?: Levels[];
   feedInfo?: FeedInfo[];
   translations?: Translation;
 } & (
@@ -1333,6 +1346,22 @@ export class GTFS {
               })
             }
 
+          case 'levels.txt':
+            const levels = ((await neatCsv(
+              bomZettaikorosuMan(entity.getData())
+            )) as unknown) as RawLevels[]
+
+            return {
+              key: 'pathways',
+              rows: levels.map<Levels>(row => {
+                return {
+                  id: row.level_id,
+                  index: Number(row.level_index),
+                  name: row.level_name || null
+                }
+              })
+            }
+
           case 'feed_info.txt':
             const rawFeedInfo = ((await neatCsv(
               bomZettaikorosuMan(entity.getData())
@@ -1429,6 +1458,7 @@ export class GTFS {
   readonly frequencies: Frequencie[] = []
   readonly transfers: Transfer[] = []
   readonly pathways: Pathwas[] = []
+  readonly levels: Levels[] = []
   readonly feedInfo: FeedInfo[] = []
   readonly translations: Translation = {}
 
@@ -1447,6 +1477,7 @@ export class GTFS {
     if (gtfs.frequencies !== undefined) this.frequencies = gtfs.frequencies
     if (gtfs.transfers !== undefined) this.transfers = gtfs.transfers
     if (gtfs.pathways !== undefined) this.pathways = gtfs.pathways
+    if (gtfs.levels !== undefined) this.levels = gtfs.levels
     if (gtfs.feedInfo !== undefined) this.feedInfo = gtfs.feedInfo
     if (gtfs.translations !== undefined) this.translations = gtfs.translations
   }
