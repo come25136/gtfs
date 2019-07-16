@@ -508,7 +508,7 @@ const ISO4217: string[] = [
   'ZWL'
 ]
 
-export interface FareAttributes {
+export interface FareAttribute {
   fareId: string
   price: number
   currencyType:
@@ -730,7 +730,7 @@ export type Transfer = {
   };
 }
 
-export interface Pathwas {
+export interface Pathway {
   id: string
   from: {
     stop: {
@@ -796,12 +796,12 @@ export type gtfs = {
   routes: Route[];
   trips: Trip[];
   stopTimes: StopTime[];
-  fareAttributes?: FareAttributes[];
+  fareAttributes?: FareAttribute[];
   fareRules?: FareRule[];
   shapes?: Shape[];
   frequencies?: Frequencie[];
   transfers?: Transfer[];
-  pathways?: Pathwas[];
+  pathways?: Pathway[];
   levels?: Levels[];
   feedInfo?: FeedInfo[];
   translations?: Translation;
@@ -1127,7 +1127,7 @@ export class GTFS {
 
             return {
               key: 'fareAttributes',
-              rows: rawFareAttributes.map<FareAttributes>(row => {
+              rows: rawFareAttributes.map<FareAttribute>(row => {
                 const currencyType = row.currency_type
                 const paymentMethod = Number(row.payment_method)
                 const transfers = Number(row.transfers) || null
@@ -1157,9 +1157,9 @@ export class GTFS {
                 return {
                   fareId: row.fare_id,
                   price: Number(row.price),
-                  currencyType: currencyType as FareAttributes['currencyType'],
-                  paymentMethod: paymentMethod as FareAttributes['paymentMethod'],
-                  transfers: transfers as FareAttributes['transfers'],
+                  currencyType: currencyType as FareAttribute['currencyType'],
+                  paymentMethod: paymentMethod as FareAttribute['paymentMethod'],
+                  transfers: transfers as FareAttribute['transfers'],
                   agencyId: row.agency_id || null,
                   transferDuration: transferDuration || null
                 }
@@ -1302,7 +1302,7 @@ export class GTFS {
 
             return {
               key: 'pathways',
-              rows: pathways.map<Pathwas>(row => {
+              rows: pathways.map<Pathway>(row => {
                 const pathwayMode = Number(row.pathway_mode)
                 const isBidirectional = Number(row.is_bidirectional)
 
@@ -1327,8 +1327,8 @@ export class GTFS {
                       id: row.to_stop_id
                     }
                   },
-                  pathwayMode: pathwayMode as Pathwas['pathwayMode'],
-                  isBidirectional: isBidirectional as Pathwas['isBidirectional'],
+                  pathwayMode: pathwayMode as Pathway['pathwayMode'],
+                  isBidirectional: isBidirectional as Pathway['isBidirectional'],
                   length: row.length === undefined ? null : Number(row.length),
                   traversalTime: row.traversal_time === undefined ? null : Number(row.traversal_time),
                   stair: {
@@ -1452,12 +1452,12 @@ export class GTFS {
   readonly stopTimes: StopTime[] = []
   readonly calendar: Calendar[] = []
   readonly calendarDates: CalendarDate[] = []
-  readonly fareAttributes: FareAttributes[] = []
+  readonly fareAttributes: FareAttribute[] = []
   readonly fareRules: FareRule[] = []
   readonly shapes: Shape[] = []
   readonly frequencies: Frequencie[] = []
   readonly transfers: Transfer[] = []
-  readonly pathways: Pathwas[] = []
+  readonly pathways: Pathway[] = []
   readonly levels: Levels[] = []
   readonly feedInfo: FeedInfo[] = []
   readonly translations: Translation = {}
