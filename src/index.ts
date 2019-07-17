@@ -722,17 +722,14 @@ export type Transfer = {
       id: string;
     };
   };
-  transfer: {
-    type: 0 | 1 | 3;
+} & ({
+  type: 0 | 1 | 3;
+} | {
+  type: 2;
+  time: {
+    min: number;
   };
-} & {
-  transfer: {
-    type: 2;
-    time: {
-      min: number;
-    };
-  };
-}
+})
 
 export interface Pathway {
   id: string
@@ -1283,6 +1280,21 @@ export class GTFS {
                     )
                 }
 
+                if (transferType === 2) return {
+                  stop: {
+                    from: {
+                      id: row.from_stop_id
+                    },
+                    to: {
+                      id: row.to_stop_id
+                    }
+                  },
+                  type: transferType,
+                  time: {
+                    min: minTransferTime
+                  }
+                }
+
                 return {
                   stop: {
                     from: {
@@ -1292,12 +1304,7 @@ export class GTFS {
                       id: row.to_stop_id
                     }
                   },
-                  transfer: {
-                    type: row.transfer_type as Transfer['transfer']['type'],
-                    time: {
-                      min: minTransferTime
-                    }
-                  }
+                  type: transferType as 0 | 1 |  3
                 }
               })
             }
