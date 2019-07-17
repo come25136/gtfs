@@ -216,7 +216,7 @@ export interface MultiAgency extends Agency {
   id: string
 }
 
-export type Agencies = [Agency, ...MultiAgency[]]
+export type Agencies = [Agency] | MultiAgency[]
 
 export interface Stop {
   id: string
