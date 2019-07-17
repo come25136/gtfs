@@ -62,20 +62,20 @@ export interface RawStop {
 }
 
 export type RawRoute = {
-  route_id: string;
-  agency_id?: string;
-  route_desc?: string;
-  route_type: string;
-  route_url?: string;
-  route_color: string; // FFFFFF
-  route_text_color?: string; // 000000
-  route_sort_order?: string;
+  route_id: string
+  agency_id?: string
+  route_desc?: string
+  route_type: string
+  route_url?: string
+  route_color: string // FFFFFF
+  route_text_color?: string // 000000
+  route_sort_order?: string
 } & (
     | { route_short_name: string }
     | { route_long_name: string }
     | {
-      route_short_name: string;
-      route_long_name: string;
+      route_short_name: string
+      route_long_name: string
     })
 
 export interface RawTrip {
@@ -225,7 +225,7 @@ export interface Stop {
   description: null | string
   location: { type: 0 | 1 | 2 } & Location
   zone: {
-    id: null | string;
+    id: null | string
   }
   url: null | string
   parentStation: null | 0 | 1
@@ -242,12 +242,12 @@ export interface Route {
   agencyId: Agency['id']
   name:
   | {
-    short: string;
-    long: null | string;
+    short: string
+    long: null | string
   }
   | {
-    short: null | string;
-    long: string;
+    short: null | string
+    long: string
   }
   description: null | string
   type: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
@@ -273,8 +273,8 @@ export interface Trip {
 export interface StopTime {
   tripId: Trip['id']
   time: {
-    arrival: moment.Moment;
-    departure: moment.Moment;
+    arrival: moment.Moment
+    departure: moment.Moment
   }
 
   stopId: Stop['id']
@@ -290,30 +290,30 @@ export interface RouteStop<Realtime extends boolean = false> extends Stop {
   sequence: StopTime['sequence']
   date: {
     arrival: {
-      schedule: moment.Moment;
-    };
+      schedule: moment.Moment
+    }
     departure: {
-      schedule: moment.Moment;
-    };
+      schedule: moment.Moment
+    }
   } & (Realtime extends true
     ?
     | {
       arrival: {
-        decision: moment.Moment;
-      };
+        decision: moment.Moment
+      }
     }
     | {
       departure: {
-        decision: moment.Moment;
-      };
+        decision: moment.Moment
+      }
     }
     | {
       arrival: {
-        decision: moment.Moment;
-      };
+        decision: moment.Moment
+      }
       departure: {
-        decision: moment.Moment;
-      };
+        decision: moment.Moment
+      }
     }
 
     : {})
@@ -324,17 +324,17 @@ export interface RouteStop<Realtime extends boolean = false> extends Stop {
 export interface Calendar {
   serviceId: Trip['serviceId']
   days: {
-    mon: boolean;
-    tues: boolean;
-    wednes: boolean;
-    thurs: boolean;
-    fri: boolean;
-    satur: boolean;
-    sun: boolean;
+    mon: boolean
+    tues: boolean
+    wednes: boolean
+    thurs: boolean
+    fri: boolean
+    satur: boolean
+    sun: boolean
   }
   date: {
-    start: moment.Moment;
-    end: moment.Moment;
+    start: moment.Moment
+    end: moment.Moment
   }
 }
 
@@ -706,8 +706,8 @@ export interface Shape {
 export interface Frequencie {
   tripId: Trip['id']
   time: {
-    start: moment.Moment;
-    end: moment.Moment;
+    start: moment.Moment
+    end: moment.Moment
   }
   headwaySecs: number
   exactTimes: 0 | 1
@@ -716,19 +716,19 @@ export interface Frequencie {
 export type Transfer = {
   stop: {
     from: {
-      id: string;
-    };
+      id: string
+    }
     to: {
-      id: string;
-    };
-  };
+      id: string
+    }
+  }
 } & ({
-  type: 0 | 1 | 3;
+  type: 0 | 1 | 3
 } | {
-  type: 2;
+  type: 2
   time: {
-    min: number;
-  };
+    min: number
+  }
 })
 
 export interface Pathway {
@@ -768,52 +768,52 @@ export interface Level {
 
 export interface FeedInfo {
   publisher: {
-    name: string;
-    url: string;
+    name: string
+    url: string
   }
   lang: string
   date: {
-    start: null | moment.Moment;
-    end: null | moment.Moment;
+    start: null | moment.Moment
+    end: null | moment.Moment
   }
   version: null | string
   contact: {
-    email: null | string;
-    url: null | string;
+    email: null | string
+    url: null | string
   }
 }
 
 export interface Translation {
   [id: string]: {
-    [lang: string]: string;
+    [lang: string]: string
   }
 }
 
 const dayNames = ['sun', 'mon', 'tues', 'wednes', 'thurs', 'fri', 'satur']
 
 export type gtfs = {
-  agency: Agencies;
-  stops: Stop[];
-  routes: Route[];
-  trips: Trip[];
-  stopTimes: StopTime[];
-  fareAttributes?: FareAttribute[];
-  fareRules?: FareRule[];
-  shapes?: Shape[];
-  frequencies?: Frequencie[];
-  transfers?: Transfer[];
-  pathways?: Pathway[];
-  levels?: Level[];
-  feedInfo?: FeedInfo[];
-  translations?: Translation;
+  agency: Agencies
+  stops: Stop[]
+  routes: Route[]
+  trips: Trip[]
+  stopTimes: StopTime[]
+  fareAttributes?: FareAttribute[]
+  fareRules?: FareRule[]
+  shapes?: Shape[]
+  frequencies?: Frequencie[]
+  transfers?: Transfer[]
+  pathways?: Pathway[]
+  levels?: Level[]
+  feedInfo?: FeedInfo[]
+  translations?: Translation
 } & (
     | { calendar: Calendar[] }
     | {
-      calendarDates: CalendarDate[];
+      calendarDates: CalendarDate[]
     }
     | {
-      calendar: Calendar[];
-      calendarDates: CalendarDate[];
+      calendar: Calendar[]
+      calendarDates: CalendarDate[]
     })
 
 export class GTFS {
@@ -1304,7 +1304,7 @@ export class GTFS {
                       id: row.to_stop_id
                     }
                   },
-                  type: transferType as 0 | 1 |  3
+                  type: transferType as 0 | 1 | 3
                 }
               })
             }
@@ -1577,16 +1577,16 @@ export class GTFS {
   findRoutes(
     args:
       | {
-        tripId: string;
-        standardDate?: moment.Moment;
+        tripId: string
+        standardDate?: moment.Moment
       }
       | {
-        routeId: string;
-        firstStopDate?: moment.Moment;
-        dayOnly?: boolean;
+        routeId: string
+        firstStopDate?: moment.Moment
+        dayOnly?: boolean
       }
   ): (Trip & {
-    stops: RouteStop[];
+    stops: RouteStop[]
   })[] {
     const trips = this.findTrips(args)
 
@@ -1687,10 +1687,10 @@ export class GTFS {
   findTrips(
     args:
       | {
-        tripId: string;
+        tripId: string
       }
       | {
-        routeId: string;
+        routeId: string
       }
   ): Trip[] {
     if ('tripId' in args) {
@@ -1713,11 +1713,11 @@ export class GTFS {
   getShape(
     routeId: string
   ): {
-    id: string;
+    id: string
     points: {
-      location: Location;
-      distTraveled: null | number;
-    }[];
+      location: Location
+      distTraveled: null | number
+    }[]
   } {
     const trip = _.find(this.trips, { routeId })
     if (trip === undefined || trip.shapeId === null)
@@ -1741,9 +1741,9 @@ export class GTFS {
   getGeoRoute(
     routeId: string
   ): {
-    id: string;
-    type: 'LineString';
-    coordinates: [number, number][];
+    id: string
+    type: 'LineString'
+    coordinates: [number, number][]
   } {
     const shape = this.getShape(routeId)
 
