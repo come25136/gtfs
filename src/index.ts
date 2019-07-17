@@ -57,6 +57,7 @@ export interface RawStop {
   parent_station?: string
   stop_timezone?: string // Asia/Tokyo
   wheelchair_boarding?: string
+  level_id?: string
   platform_code?: string
 }
 
@@ -230,6 +231,9 @@ export interface Stop {
   parentStation: null | 0 | 1
   timezone: null | string
   wheelchairBoarding: 0 | 1 | 2
+  level: {
+    id: null | Levels['id']
+  }
   platformCode: null | string
 }
 
@@ -903,6 +907,9 @@ export class GTFS {
                   parentStation: parentStation as Stop['parentStation'],
                   timezone: row.stop_timezone || null,
                   wheelchairBoarding: wheelchairBoarding as Stop['wheelchairBoarding'],
+                  level: {
+                    id: row.level_id === undefined ? null : row.level_id
+                  },
                   platformCode: row.parent_station || null
                 }
               })
