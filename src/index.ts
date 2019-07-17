@@ -163,7 +163,7 @@ export interface RawTransfer {
   min_transfer_time?: string
 }
 
-export interface RawPathwas {
+export interface RawPathway {
   pathway_id: string
   from_stop_id: RawStop['stop_id']
   to_stop_id: RawStop['stop_id']
@@ -178,7 +178,7 @@ export interface RawPathwas {
   reversed_signposted_as?: string
 }
 
-export interface RawLevels {
+export interface RawLevel {
   level_id: string
   level_index: string
   level_name?: string
@@ -232,7 +232,7 @@ export interface Stop {
   timezone: null | string
   wheelchairBoarding: 0 | 1 | 2
   level: {
-    id: null | Levels['id']
+    id: null | Level['id']
   }
   platformCode: null | string
 }
@@ -763,7 +763,7 @@ export interface Pathway {
   reversedSignpostedAs: null | string
 }
 
-export interface Levels {
+export interface Level {
   id: string
   index: number
   name: null | string
@@ -806,7 +806,7 @@ export type gtfs = {
   frequencies?: Frequencie[];
   transfers?: Transfer[];
   pathways?: Pathway[];
-  levels?: Levels[];
+  levels?: Level[];
   feedInfo?: FeedInfo[];
   translations?: Translation;
 } & (
@@ -1305,7 +1305,7 @@ export class GTFS {
           case 'pathways.txt':
             const pathways = ((await neatCsv(
               bomZettaikorosuMan(entity.getData())
-            )) as unknown) as RawPathwas[]
+            )) as unknown) as RawPathway[]
 
             return {
               key: 'pathways',
@@ -1356,11 +1356,11 @@ export class GTFS {
           case 'levels.txt':
             const levels = ((await neatCsv(
               bomZettaikorosuMan(entity.getData())
-            )) as unknown) as RawLevels[]
+            )) as unknown) as RawLevel[]
 
             return {
               key: 'pathways',
-              rows: levels.map<Levels>(row => {
+              rows: levels.map<Level>(row => {
                 return {
                   id: row.level_id,
                   index: Number(row.level_index),
@@ -1465,7 +1465,7 @@ export class GTFS {
   readonly frequencies: Frequencie[] = []
   readonly transfers: Transfer[] = []
   readonly pathways: Pathway[] = []
-  readonly levels: Levels[] = []
+  readonly levels: Level[] = []
   readonly feedInfo: FeedInfo[] = []
   readonly translations: Translation = {}
 
