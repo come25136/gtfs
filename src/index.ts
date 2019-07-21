@@ -148,7 +148,7 @@ export interface RawShape {
   shape_pt_sequence: string
   shape_dist_traveled?: string
 }
-export interface RawFrequencie {
+export interface RawFrequency {
   trip_id: string
   start_time: string
   end_time: string
@@ -703,7 +703,7 @@ export interface Shape {
   distTraveled: null | number
 }
 
-export interface Frequencie {
+export interface Frequency {
   tripId: Trip['id']
   time: {
     start: moment.Moment
@@ -800,7 +800,7 @@ export type gtfs = {
   fareAttributes?: FareAttribute[]
   fareRules?: FareRule[]
   shapes?: Shape[]
-  frequencies?: Frequencie[]
+  frequencies?: Frequency[]
   transfers?: Transfer[]
   pathways?: Pathway[]
   levels?: Level[]
@@ -1227,11 +1227,11 @@ export class GTFS {
           case 'frequencies.txt':
             const rawFrequencies = ((await neatCsv(
               bomZettaikorosuMan(entity.getData())
-            )) as unknown) as RawFrequencie[]
+            )) as unknown) as RawFrequency[]
 
             return {
               key: 'frequencies',
-              rows: rawFrequencies.map<Frequencie>(row => {
+              rows: rawFrequencies.map<Frequency>(row => {
                 const headwaySecs = Number(row.headway_secs)
                 const exactTimes = Number(row.exact_times) || 0
 
@@ -1249,7 +1249,7 @@ export class GTFS {
                     end: moment(row.end_time, 'HH:mm:ss')
                   },
                   headwaySecs,
-                  exactTimes: exactTimes as Frequencie['exactTimes']
+                  exactTimes: exactTimes as Frequency['exactTimes']
                 }
               })
             }
@@ -1469,7 +1469,7 @@ export class GTFS {
   readonly fareAttributes: FareAttribute[] = []
   readonly fareRules: FareRule[] = []
   readonly shapes: Shape[] = []
-  readonly frequencies: Frequencie[] = []
+  readonly frequencies: Frequency[] = []
   readonly transfers: Transfer[] = []
   readonly pathways: Pathway[] = []
   readonly levels: Level[] = []
