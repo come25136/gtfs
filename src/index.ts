@@ -315,10 +315,8 @@ export interface RouteStop<Realtime extends boolean = false> extends Stop {
         decision: moment.Moment
       }
     }
-
     : {})
-  headsign: Trip['headsign']
-  direction: Trip['directionId']
+  headsign: StopTime['headsign']
 }
 
 export interface Calendar {
@@ -1624,8 +1622,7 @@ export class GTFS {
           location: stop.location,
           headsign: convertStringFullWidthToHalfWidth(
             stopTime.headsign || trips[0].headsign
-          ),
-          direction: trips[0].directionId
+          )
         }
       })
 
