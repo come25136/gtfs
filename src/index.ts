@@ -1665,8 +1665,7 @@ export class GTFS {
                 }
               },
               location: stop.location,
-              headsign: stopTime.headsign || trip.headsign,
-              direction: trip.directionId
+              headsign: stopTime.headsign || trip.headsign
             }
           })
 
