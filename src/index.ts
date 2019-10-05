@@ -900,7 +900,7 @@ export class GTFS {
                   level: {
                     id: row.level_id === undefined ? null : row.level_id
                   },
-                  platformCode: row.parent_station || null
+                  platformCode: row.platform_code === undefined || row.platform_code === '' ? null : row.platform_code
                 }
               })
             }
