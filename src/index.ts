@@ -228,7 +228,7 @@ export interface Stop {
     id: null | string
   }
   url: null | string
-  parentStation: null | 0 | 1
+  parentStation: null | string
   timezone: null | string
   wheelchairBoarding: 0 | 1 | 2
   level: {
@@ -871,16 +871,11 @@ export class GTFS {
               key: 'stops',
               rows: rawStops.map<Stop>(row => {
                 const locationType = Number(row.location_type) || 0
-                const parentStation = Number(row.parent_station) || 0
                 const wheelchairBoarding = Number(row.wheelchair_boarding) || 0
 
                 if ([0, 1, 2].includes(locationType) === false)
                   throw new Error(
                     `Can not use '${locationType}' for location_type.`
-                  )
-                if ([0, 1].includes(parentStation) === false)
-                  throw new Error(
-                    `Can not use '${parentStation}' for parent_station.`
                   )
                 if ([0, 1, 2].includes(wheelchairBoarding) === false)
                   throw new Error(
@@ -899,7 +894,7 @@ export class GTFS {
                   },
                   zone: { id: row.zone_id || null },
                   url: row.stop_url || null,
-                  parentStation: parentStation as Stop['parentStation'],
+                  parentStation: row.parent_station === undefined || row.parent_station === '' ? null : row.parent_station,
                   timezone: row.stop_timezone || null,
                   wheelchairBoarding: wheelchairBoarding as Stop['wheelchairBoarding'],
                   level: {
