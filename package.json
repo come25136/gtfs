@@ -15,7 +15,7 @@
     "adm-zip": "^0.4.13",
     "http-errors": "^1.7.3",
     "lodash": "^4.17.15",
-    "moment": "^2.24.0",
+    "moment-timezone": "^0.5.26",
     "neat-csv": "^5.1.0",
     "strip-bom-buf": "^2.0.0"
   },
@@ -23,6 +23,7 @@
     "@types/adm-zip": "^0.4.32",
     "@types/http-errors": "^1.6.1",
     "@types/lodash": "^4.14.136",
+    "@types/moment-timezone": "^0.5.12",
     "tslint": "^5.18.0",
     "typescript": "^3.5.3"
   },

@@ -1,7 +1,7 @@
 import * as admZip from 'adm-zip'
 import * as createHttpError from 'http-errors'
 import * as _ from 'lodash'
-import * as moment from 'moment'
+import * as moment from 'moment-timezone'
 import * as neatCsv from 'neat-csv'
 import bomZettaikorosuMan = require('strip-bom-buf')
 
@@ -827,6 +827,16 @@ export class GTFS {
     )
       throw new Error('It is not normal GTSF.')
 
+    const agencyTimezone: string = (await neatCsv(
+      (zipEntries.find(
+        ({ entryName }) => entryName === 'agency.txt'
+      ) as admZip.IZipEntry).getData()
+    ))[0].agency_timezone // NOTE: agency_timezoneは全部同じ https://developers.google.com/transit/gtfs/reference#agencytxt
+
+    function momentAgencyTimezone(m: moment.Moment) {
+      return m.tz(agencyTimezone)
+    }
+
     const entries = await Promise.all(
       zipEntries.map(async entity => {
         switch (entity.entryName) {
@@ -1030,8 +1040,8 @@ export class GTFS {
                 return {
                   tripId: row.trip_id,
                   time: {
-                    arrival: h24ToLessH24(row.arrival_time),
-                    departure: h24ToLessH24(row.departure_time)
+                    arrival: h24ToLessH24(row.arrival_time, momentAgencyTimezone(moment())),
+                    departure: h24ToLessH24(row.departure_time, momentAgencyTimezone(moment()))
                   },
                   stopId: row.stop_id,
                   sequence: Number(row.stop_sequence),
@@ -1087,8 +1097,8 @@ export class GTFS {
                     sun: Boolean(sunday)
                   },
                   date: {
-                    start: moment(row.start_date, 'YYYYMMDD'),
-                    end: moment(row.end_date, 'YYYYMMDD')
+                    start: momentAgencyTimezone(moment(row.start_date, 'YYYYMMDD')),
+                    end: momentAgencyTimezone(moment(row.end_date, 'YYYYMMDD'))
                   }
                 }
               })
@@ -1111,7 +1121,7 @@ export class GTFS {
 
                 return {
                   serviceId: row.service_id,
-                  date: moment(row.date, 'YYYYMMDD'),
+                  date: momentAgencyTimezone(moment(row.date, 'YYYYMMDD')),
                   exceptionType: exceptionType as CalendarDate['exceptionType']
                 }
               })
@@ -1238,8 +1248,8 @@ export class GTFS {
                 return {
                   tripId: row.trip_id,
                   time: {
-                    start: moment(row.start_time, 'HH:mm:ss'),
-                    end: moment(row.end_time, 'HH:mm:ss')
+                    start: momentAgencyTimezone(moment(row.start_time, 'HH:mm:ss')),
+                    end: momentAgencyTimezone(moment(row.end_time, 'HH:mm:ss'))
                   },
                   headwaySecs,
                   exactTimes: exactTimes as Frequency['exactTimes']
@@ -1377,8 +1387,8 @@ export class GTFS {
             return {
               key: 'feedInfo',
               rows: rawFeedInfo.map<FeedInfo>(row => {
-                const startDate = moment(row.feed_start_date, 'YYYYMMDD')
-                const endDate = moment(row.feed_end_date, 'YYYYMMDD')
+                const startDate = momentAgencyTimezone(moment(row.feed_start_date, 'YYYYMMDD'))
+                const endDate = momentAgencyTimezone(moment(row.feed_end_date, 'YYYYMMDD'))
 
                 if (startDate.isValid() === false)
                   throw createHttpError(

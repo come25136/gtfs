@@ -1,4 +1,4 @@
-import * as moment from 'moment'
+import * as moment from 'moment-timezone'
 
 /**
  * @param date 00:00:00
