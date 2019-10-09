@@ -1,6 +1,6 @@
 {
   "name": "@come25136/gtfs",
-  "version": "1.2.4",
+  "version": "1.3.0",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
