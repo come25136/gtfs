@@ -37,7 +37,9 @@ export function h24ToLessH24(
         .clone()
         .subtract(Math.floor(time.hour / 24), 'd')
         .hour(
-          1 <= time.hour / 24 ? (time.hour / 24 - Math.floor(time.hour / 24)) * 24 : time.hour
+          1 <= time.hour / 24
+            ? (time.hour / 24 - Math.floor(time.hour / 24)) * 24
+            : time.hour
         )
         .minute(time.minute)
         .second(time.second)
@@ -58,7 +60,9 @@ export function convertStringFullWidthToHalfWidth<char extends string | null>(
 ): string | char {
   return typeof char === 'string'
     ? char
-      .replace(/[Ａ-Ｚａ-ｚ０-９]/g, char => String.fromCharCode(char.charCodeAt(0) - 0xfee0))
+      .replace(/[Ａ-Ｚａ-ｚ０-９]/g, char =>
+        String.fromCharCode(char.charCodeAt(0) - 0xfee0)
+      )
       .replace(/（(.*)）/, '($1)')
       .replace(/(\S)(?!\s)(\()/, '$1 $2')
       .replace(/(\))(?!\s)(\S)/, '$1 $2')

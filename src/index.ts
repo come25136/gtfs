@@ -720,14 +720,16 @@ export type Transfer = {
       id: string
     }
   }
-} & ({
-  type: 0 | 1 | 3
-} | {
-  type: 2
-  time: {
-    min: number
-  }
-})
+} & (
+    | {
+      type: 0 | 1 | 3
+    }
+    | {
+      type: 2
+      time: {
+        min: number
+      }
+    })
 
 export interface Pathway {
   id: string
@@ -904,13 +906,20 @@ export class GTFS {
                   },
                   zone: { id: row.zone_id || null },
                   url: row.stop_url || null,
-                  parentStation: row.parent_station === undefined || row.parent_station === '' ? null : row.parent_station,
+                  parentStation:
+                    row.parent_station === undefined ||
+                      row.parent_station === ''
+                      ? null
+                      : row.parent_station,
                   timezone: row.stop_timezone || null,
                   wheelchairBoarding: wheelchairBoarding as Stop['wheelchairBoarding'],
                   level: {
                     id: row.level_id === undefined ? null : row.level_id
                   },
-                  platformCode: row.platform_code === undefined || row.platform_code === '' ? null : row.platform_code
+                  platformCode:
+                    row.platform_code === undefined || row.platform_code === ''
+                      ? null
+                      : row.platform_code
                 }
               })
             }
@@ -1283,20 +1292,21 @@ export class GTFS {
                     )
                 }
 
-                if (transferType === 2) return {
-                  stop: {
-                    from: {
-                      id: row.from_stop_id
+                if (transferType === 2)
+                  return {
+                    stop: {
+                      from: {
+                        id: row.from_stop_id
+                      },
+                      to: {
+                        id: row.to_stop_id
+                      }
                     },
-                    to: {
-                      id: row.to_stop_id
+                    type: transferType,
+                    time: {
+                      min: minTransferTime
                     }
-                  },
-                  type: transferType,
-                  time: {
-                    min: minTransferTime
                   }
-                }
 
                 return {
                   stop: {
@@ -1328,9 +1338,10 @@ export class GTFS {
                     `Can not use '${pathwayMode}' for pathway_mode.`
                   )
 
-                if ([0, 1].includes(isBidirectional) === false) throw new Error(
-                  `Can not use '${isBidirectional}' for is_bidirectional.`
-                )
+                if ([0, 1].includes(isBidirectional) === false)
+                  throw new Error(
+                    `Can not use '${isBidirectional}' for is_bidirectional.`
+                  )
 
                 return {
                   id: row.pathway_id,
@@ -1347,15 +1358,23 @@ export class GTFS {
                   pathwayMode: pathwayMode as Pathway['pathwayMode'],
                   isBidirectional: isBidirectional as Pathway['isBidirectional'],
                   length: row.length === undefined ? null : Number(row.length),
-                  traversalTime: row.traversal_time === undefined ? null : Number(row.traversal_time),
+                  traversalTime:
+                    row.traversal_time === undefined
+                      ? null
+                      : Number(row.traversal_time),
                   stair: {
-                    count: row.stair_count === undefined ? null : Number(row.stair_count)
+                    count:
+                      row.stair_count === undefined
+                        ? null
+                        : Number(row.stair_count)
                   },
                   slope: {
-                    max: row.max_slope === undefined ? null : Number(row.max_slope)
+                    max:
+                      row.max_slope === undefined ? null : Number(row.max_slope)
                   },
                   width: {
-                    min: row.min_width === undefined ? null : Number(row.min_width)
+                    min:
+                      row.min_width === undefined ? null : Number(row.min_width)
                   },
                   signpostedAs: row.signposted_as || null,
                   reversedSignpostedAs: row.reversed_signposted_as || null
