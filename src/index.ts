@@ -286,7 +286,7 @@ export interface StopTime {
   timepoint: 0 | 1
 }
 
-export interface RouteStop<Realtime extends boolean = false> extends Stop {
+export interface RouteStopSchedule extends Stop {
   sequence: StopTime['sequence']
   date: {
     arrival: {
@@ -295,29 +295,30 @@ export interface RouteStop<Realtime extends boolean = false> extends Stop {
     departure: {
       schedule: moment.Moment
     }
-  } & (Realtime extends true
-    ?
-    | {
-      arrival: {
-        decision: moment.Moment
-      }
-    }
-    | {
-      departure: {
-        decision: moment.Moment
-      }
-    }
-    | {
-      arrival: {
-        decision: moment.Moment
-      }
-      departure: {
-        decision: moment.Moment
-      }
-    }
-    : {})
+  }
   headsign: StopTime['headsign']
 }
+
+export interface RouteStopRealtime extends RouteStopSchedule {
+  date: RouteStopSchedule['date'] & ({
+    arrival: {
+      decision: moment.Moment
+    }
+  } | {
+    departure: {
+      decision: moment.Moment
+    }
+  } | {
+    arrival: {
+      decision: moment.Moment
+    }
+    departure: {
+      decision: moment.Moment
+    }
+  })
+}
+
+export type RouteStop<Realtime extends boolean = false> = Realtime extends true ? RouteStopRealtime : RouteStopSchedule
 
 export interface Calendar {
   serviceId: Trip['serviceId']
