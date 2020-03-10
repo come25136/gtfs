@@ -1050,8 +1050,8 @@ export class GTFS {
                 return {
                   tripId: row.trip_id,
                   time: {
-                    arrival: h24ToLessH24(row.arrival_time, momentAgencyTimezone(moment())),
-                    departure: h24ToLessH24(row.departure_time, momentAgencyTimezone(moment()))
+                    arrival: h24ToLessH24(row.arrival_time, momentAgencyTimezone(moment('1970-01-01T00:00:00Z'))),
+                    departure: h24ToLessH24(row.departure_time, momentAgencyTimezone(moment('1970-01-01T00:00:00Z')))
                   },
                   stopId: row.stop_id,
                   sequence: Number(row.stop_sequence),
