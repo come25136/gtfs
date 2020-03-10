@@ -1,6 +1,6 @@
 {
   "name": "@come25136/gtfs",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
@@ -28,7 +28,6 @@
     "typescript": "^3.5.3"
   },
   "scripts": {
-    "prepare": "tsc",
     "build": "tsc",
     "lint": "tslint --fix -p ."
   },
