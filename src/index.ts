@@ -837,7 +837,7 @@ export class GTFS {
     ))[0].agency_timezone // NOTE: agency_timezoneは全部同じ https://developers.google.com/transit/gtfs/reference#agencytxt
 
     function momentAgencyTimezone(m: moment.Moment) {
-      return m.tz(agencyTimezone)
+      return m.tz(agencyTimezone, true)
     }
 
     const entries = await Promise.all(
