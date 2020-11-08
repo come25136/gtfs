@@ -3,18 +3,26 @@
     "sourceMap": true,
     "declaration": true,
     "strict": true,
-    "target": "es6",
+    "target": "es2017",
     "module": "commonjs",
     "outDir": "dist",
-    "lib": ["es2017", "dom"],
+    "lib": [
+      "es2020",
+      "dom"
+    ],
     "removeComments": true,
     "experimentalDecorators": true,
     "baseUrl": "src",
     "paths": {
-      "*": ["types/*"]
+      "*": [
+        "types/*"
+      ]
     },
     "pretty": true,
     "newLine": "LF"
   },
-  "exclude": [".history/", "dist"]
+  "exclude": [
+    ".history/",
+    "dist"
+  ]
 }
