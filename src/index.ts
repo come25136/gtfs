@@ -3,7 +3,7 @@ import * as createHttpError from 'http-errors'
 import * as _ from 'lodash'
 import * as moment from 'moment-timezone'
 import * as neatCsv from 'neat-csv'
-import bomZettaikorosuMan = require('strip-bom-buf')
+import stripBom = require('strip-bom-buf')
 
 import { convertStringFullWidthToHalfWidth, h24ToLessH24 } from './util'
 
@@ -188,6 +188,7 @@ export interface RawFeedInfo {
   feed_publisher_name: string
   feed_publisher_url: string
   feed_lang: string
+  default_lang?: string
   feed_start_date?: string
   feed_end_date?: string
   feed_version?: string
@@ -196,9 +197,27 @@ export interface RawFeedInfo {
 }
 
 export interface RawTranslation {
-  trans_id: string
-  lang: string
+  table_name: string
+  field_name: string
+  language: string
   translation: string
+  record_id?: string
+  record_sub_id?: string
+  field_value?: string
+}
+
+export interface RawAttributions {
+  attribution_id?: string
+  agency_id?: string
+  route_id?: string
+  trip_id?: string
+  organization_name: string
+  is_producer?: string
+  is_operator?: string
+  is_authority?: string
+  attribution_url?: string
+  attribution_email?: string
+  attribution_phone?: string
 }
 
 export interface Agency {
@@ -772,6 +791,7 @@ export interface FeedInfo {
     name: string
     url: string
   }
+  defaultLang: null | string
   lang: string
   date: {
     start: null | moment.Moment
@@ -784,10 +804,95 @@ export interface FeedInfo {
   }
 }
 
-export interface Translation {
-  [id: string]: {
-    [lang: string]: string
+export type Translation = {
+  language: string
+  translation: string
+} & (
+    (
+      {
+        table: {
+          name:
+          'agency' |
+          'stops' |
+          'routes' |
+          'trips' |
+          'pathways' |
+          'levels' |
+          'attributions'
+        }
+        field: {
+          name: string
+        }
+      } & (
+        {
+          record: {
+            id:
+            'agency_id' |
+            'stop_id' |
+            'route_id' |
+            'trip_id' |
+            'feed_info_id' |
+            'pathway_id' |
+            'level_id' |
+            'attribution_id'
+            sub: {
+              id: null
+            }
+          }
+        } | {
+          field: {
+            value: string
+          }
+        })
+    ) | (
+      {
+        table: {
+          name: 'stop_times'
+        }
+      } & ({
+        record: {
+          id: 'trip_id'
+          sub: {
+            id: 'stop_sequence'
+          }
+        }
+      } | {
+        field: {
+          value: string
+        }
+      })
+    ) | {
+      table: {
+        name: 'field_value'
+      }
+      field: {
+        name: 'feed_info'
+      }
+    }
+  )
+
+export interface Attribution {
+  attribution: {
+    id: null | string
+    url: null | string
+    email: null | string
+    phone: null | string
   }
+  agency: {
+    id: null | string
+  }
+  route: {
+    id: null | string
+  }
+  trip: {
+    id: null | string
+  }
+  organization: {
+    name: string
+  }
+  isProducer: 0 | 1
+  isOperator: 0 | 1
+  isAuthority: 0 | 1
 }
 
 const dayNames = ['sun', 'mon', 'tues', 'wednes', 'thurs', 'fri', 'satur']
@@ -806,7 +911,8 @@ export type gtfs = {
   pathways?: Pathway[]
   levels?: Level[]
   feedInfo?: FeedInfo[]
-  translations?: Translation
+  translations?: Translation[]
+  attributions?: Attribution[]
 } & (
     | { calendar: Calendar[] }
     | {
@@ -848,7 +954,7 @@ export class GTFS {
 
           case 'agency.txt':
             const rawAgencies = await neatCsv(
-              bomZettaikorosuMan(entity.getData())
+              stripBom(entity.getData())
             )
 
             if (rawAgencies.length === 0)
@@ -877,7 +983,7 @@ export class GTFS {
 
           case 'stops.txt':
             const rawStops = ((await neatCsv(
-              bomZettaikorosuMan(entity.getData())
+              stripBom(entity.getData())
             )) as unknown) as RawStop[]
 
             return {
@@ -927,7 +1033,7 @@ export class GTFS {
 
           case 'routes.txt':
             const rawRoutes = ((await neatCsv(
-              bomZettaikorosuMan(entity.getData())
+              stripBom(entity.getData())
             )) as unknown) as RawRoute[]
 
             return {
@@ -967,7 +1073,7 @@ export class GTFS {
 
           case 'trips.txt':
             const rawTrips = ((await neatCsv(
-              bomZettaikorosuMan(entity.getData())
+              stripBom(entity.getData())
             )) as unknown) as RawTrip[]
 
             return {
@@ -1026,7 +1132,7 @@ export class GTFS {
 
           case 'stop_times.txt':
             const rawStopTimes = ((await neatCsv(
-              bomZettaikorosuMan(entity.getData())
+              stripBom(entity.getData())
             )) as unknown) as RawStopTime[]
 
             return {
@@ -1066,7 +1172,7 @@ export class GTFS {
 
           case 'calendar.txt':
             const rawCalendar = ((await neatCsv(
-              bomZettaikorosuMan(entity.getData())
+              stripBom(entity.getData())
             )) as unknown) as RawCalendar[]
 
             return {
@@ -1116,7 +1222,7 @@ export class GTFS {
 
           case 'calendar_dates.txt':
             const rawCalendarDate = ((await neatCsv(
-              bomZettaikorosuMan(entity.getData())
+              stripBom(entity.getData())
             )) as unknown) as RawCalendarDate[]
 
             return {
@@ -1139,7 +1245,7 @@ export class GTFS {
 
           case 'fare_attributes.txt':
             const rawFareAttributes = ((await neatCsv(
-              bomZettaikorosuMan(entity.getData())
+              stripBom(entity.getData())
             )) as unknown) as RawFareAttribute[]
 
             return {
@@ -1185,7 +1291,7 @@ export class GTFS {
 
           case 'fare_rules.txt':
             const rawFareRules = ((await neatCsv(
-              bomZettaikorosuMan(entity.getData())
+              stripBom(entity.getData())
             )) as unknown) as RawFareRule[]
 
             return {
@@ -1201,7 +1307,7 @@ export class GTFS {
 
           case 'shapes.txt':
             const rawShapes = ((await neatCsv(
-              bomZettaikorosuMan(entity.getData())
+              stripBom(entity.getData())
             )) as unknown) as RawShape[]
 
             return {
@@ -1239,7 +1345,7 @@ export class GTFS {
 
           case 'frequencies.txt':
             const rawFrequencies = ((await neatCsv(
-              bomZettaikorosuMan(entity.getData())
+              stripBom(entity.getData())
             )) as unknown) as RawFrequency[]
 
             return {
@@ -1269,7 +1375,7 @@ export class GTFS {
 
           case 'transfers.txt':
             const rawTransfers = ((await neatCsv(
-              bomZettaikorosuMan(entity.getData())
+              stripBom(entity.getData())
             )) as unknown) as RawTransfer[]
 
             return {
@@ -1325,7 +1431,7 @@ export class GTFS {
 
           case 'pathways.txt':
             const pathways = ((await neatCsv(
-              bomZettaikorosuMan(entity.getData())
+              stripBom(entity.getData())
             )) as unknown) as RawPathway[]
 
             return {
@@ -1385,7 +1491,7 @@ export class GTFS {
 
           case 'levels.txt':
             const levels = ((await neatCsv(
-              bomZettaikorosuMan(entity.getData())
+              stripBom(entity.getData())
             )) as unknown) as RawLevel[]
 
             return {
@@ -1401,7 +1507,7 @@ export class GTFS {
 
           case 'feed_info.txt':
             const rawFeedInfo = ((await neatCsv(
-              bomZettaikorosuMan(entity.getData())
+              stripBom(entity.getData())
             )) as unknown) as RawFeedInfo[]
 
             return {
@@ -1431,6 +1537,7 @@ export class GTFS {
                     name: row.feed_publisher_name,
                     url: row.feed_publisher_url
                   },
+                  defaultLang: row.default_lang || null,
                   lang: row.feed_lang,
                   date: {
                     start: startDate,
@@ -1447,21 +1554,149 @@ export class GTFS {
 
           case 'translations.txt':
             const rawTranslations = ((await neatCsv(
-              bomZettaikorosuMan(entity.getData())
+              stripBom(entity.getData())
             )) as unknown) as RawTranslation[]
-
-            const translation: Translation = {}
-
-            rawTranslations.forEach(row => {
-              translation[row.trans_id] = {
-                ...translation[row.trans_id],
-                [row.lang]: row.translation
-              }
-            })
 
             return {
               key: 'translations',
-              rows: translation
+              rows: rawTranslations.map<Translation>(row => {
+                if ([
+                  'agency',
+                  'stops',
+                  'routes',
+                  'trips',
+                  'stop_times',
+                  'feed_info',
+                  'pathways',
+                  'levels',
+                  'attributions',
+                ].includes(row.table_name) === false)
+                  throw createHttpError(
+                    400,
+                    `Can not use '${row.table_name}' for table_name.`
+                  )
+
+                if ('field_name' in row === false || row.field_name === '')
+                  throw createHttpError(
+                    400,
+                    `Can not use '${row.field_name}' for field_name.`
+                  )
+
+                if ('language' in row === false || row.language === '')
+                  throw createHttpError(
+                    400,
+                    `Can not use '${row.language}' for language.`
+                  )
+
+                if ((
+                  (row.table_name === 'agency' && (('record_id' in row && row.record_id !== '' && row.record_sub_id === '') || ('field_value' in row && ('field_value' in row && row.field_value !== '')))) ||
+                  (row.table_name === 'stops' && (('record_id' in row && row.record_id !== '' && row.record_sub_id === '') || ('field_value' in row && row.field_value !== ''))) ||
+                  (row.table_name === 'routes' && (('record_id' in row && row.record_id !== '' && row.record_sub_id === '') || ('field_value' in row && row.field_value !== ''))) ||
+                  (row.table_name === 'trips' && (('record_id' in row && row.record_id !== '' && row.record_sub_id === '') || ('field_value' in row && row.field_value !== ''))) ||
+                  (row.table_name === 'stop_times' && (('record_id' in row && row.record_id !== '') || ('field_value' in row && row.field_value !== ''))) ||
+                  (row.table_name === 'pathways' && (('record_id' in row && row.record_id !== '' && row.record_sub_id === '') || ('field_value' in row && row.field_value !== ''))) ||
+                  (row.table_name === 'levels' && (('record_id' in row && row.record_id !== '' && row.record_sub_id === '') || ('field_value' in row && row.field_value !== ''))) ||
+                  (row.table_name === 'attributions' && (('record_id' in row && row.record_id !== '' && row.record_sub_id === '') || ('field_value' in row && row.field_value !== '')))
+                ) === false)
+                  throw createHttpError(
+                    400,
+                    `Can not use a ${row.record_id} for record_id if table_name is a ${row.table_name}.`
+                  )
+
+                if (
+                  'record_id' in row &&
+                  (row.table_name === 'trips' && row.record_id === 'trip_id' && row.record_sub_id === 'stop_sequence') === false)
+                  throw createHttpError(
+                    400,
+                    `Can not use a ${row.record_id} for record_sub_id if table_name is a ${row.table_name}.`
+                  )
+
+                const record = row.record_id ? {
+                  id: row.record_id as 'agency_id' | 'stop_id' | 'route_id' | 'trip_id' | 'feed_inf_id' | 'pathway_id' | 'level_id' | 'attribution_id',
+                  sub: {
+                    id: row.record_sub_id ?? null as null | 'stop_sequence'
+                  }
+                } : undefined
+
+                const base = {
+                  table: {
+                    name: row.table_name
+                  },
+                  language: row.language,
+                  translation: row.translation,
+                  field: {
+                    name: row.field_name,
+                  }
+                }
+
+                const data =
+                  row.table_name === 'feed_info'
+                    ? base
+                    : {
+                      ...base,
+                      record,
+                      field: {
+                        ...base.field,
+                        value: row.field_value
+                      }
+                    }
+
+                return data as Translation
+              })
+            }
+
+          case 'attributions.txt':
+            const rawAttributions = ((await neatCsv(
+              stripBom(entity.getData())
+            )) as unknown) as RawAttributions[]
+
+            return {
+              key: 'translations',
+              rows: rawAttributions.map<Attribution>(row => {
+                const isProducer = Number(row.is_producer)
+                const isOperator = Number(row.is_operator)
+                const isAuthority = Number(row.is_authority)
+
+                if ([0, 1].includes(isProducer) === false)
+                  throw createHttpError(
+                    400,
+                    'The format of is_producer is incorrect.'
+                  )
+                if ([0, 1].includes(isOperator) === false)
+                  throw createHttpError(
+                    400,
+                    'The format of is_operator is incorrect.'
+                  )
+                if ([0, 1].includes(isAuthority) === false)
+                  throw createHttpError(
+                    400,
+                    'The format of is_authority is incorrect.'
+                  )
+
+                return {
+                  attribution: {
+                    id: row.attribution_id || null,
+                    url: row.attribution_url || null,
+                    email: row.attribution_email || null,
+                    phone: row.attribution_phone || null,
+                  },
+                  agency: {
+                    id: row.agency_id || null
+                  },
+                  route: {
+                    id: row.route_id || null,
+                  },
+                  trip: {
+                    id: row.trip_id || null,
+                  },
+                  organization: {
+                    name: row.organization_name,
+                  },
+                  isProducer: isProducer as Attribution['isProducer'],
+                  isOperator: isOperator as Attribution['isOperator'],
+                  isAuthority: isAuthority as Attribution['isAuthority'],
+                }
+              })
             }
         }
       })
@@ -1497,7 +1732,8 @@ export class GTFS {
   readonly pathways: Pathway[] = []
   readonly levels: Level[] = []
   readonly feedInfo: FeedInfo[] = []
-  readonly translations: Translation = {}
+  readonly translations: Translation[] = []
+  readonly attributions: Attribution[] = []
 
   constructor(gtfs: gtfs) {
     this.agencies = gtfs.agency
@@ -1507,8 +1743,7 @@ export class GTFS {
     this.stopTimes = gtfs.stopTimes
     if ('calendar' in gtfs) this.calendar = gtfs.calendar
     if ('calendarDates' in gtfs) this.calendarDates = gtfs.calendarDates
-    if (gtfs.fareAttributes !== undefined)
-      this.fareAttributes = gtfs.fareAttributes
+    if (gtfs.fareAttributes !== undefined) this.fareAttributes = gtfs.fareAttributes
     if (gtfs.fareRules !== undefined) this.fareRules = gtfs.fareRules
     if (gtfs.shapes !== undefined) this.shapes = gtfs.shapes
     if (gtfs.frequencies !== undefined) this.frequencies = gtfs.frequencies
@@ -1517,6 +1752,7 @@ export class GTFS {
     if (gtfs.levels !== undefined) this.levels = gtfs.levels
     if (gtfs.feedInfo !== undefined) this.feedInfo = gtfs.feedInfo
     if (gtfs.translations !== undefined) this.translations = gtfs.translations
+    if (gtfs.attributions !== undefined) this.attributions = gtfs.attributions
   }
 
   findServiceIds(date: moment.Moment): string[] {
@@ -1777,11 +2013,12 @@ export class GTFS {
       ])
     }
   }
-
+  /*
   findTranslation(stopName: string): { [lang: string]: string } {
     if (stopName in this.translations === false)
       throw createHttpError(404, 'There is no such stop name.')
-
+ 
     return this.translations[stopName]
   }
+  */
 }
