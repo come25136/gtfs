@@ -872,12 +872,10 @@ export type Translation = {
   )
 
 export interface Attribution {
-  attribution: {
-    id: null | string
-    url: null | string
-    email: null | string
-    phone: null | string
-  }
+  id: null | string
+  url: null | string
+  email: null | string
+  phone: null | string
   agency: {
     id: null | string
   }
@@ -1674,12 +1672,10 @@ export class GTFS {
                   )
 
                 return {
-                  attribution: {
-                    id: row.attribution_id || null,
-                    url: row.attribution_url || null,
-                    email: row.attribution_email || null,
-                    phone: row.attribution_phone || null,
-                  },
+                  id: row.attribution_id || null,
+                  url: row.attribution_url || null,
+                  email: row.attribution_email || null,
+                  phone: row.attribution_phone || null,
                   agency: {
                     id: row.agency_id || null
                   },
